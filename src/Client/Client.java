@@ -55,9 +55,14 @@ public class Client {
             // Exception should be non-halting. Caught by client and addressed
             try {
                 String messageSpecs;
-                while ((messageSpecs = fromServer.readLine()) != null) {
+                while (true) {
+                    System.out.println("Glizzy 3");
+                    messageSpecs = fromServer.readLine();
+                    System.out.println("Glizzy 2");
+                    if (messageSpecs == null) break;
                     // Split the message into it's individual components
-                    String[] directivesArray = messageSpecs.split(",");
+                    System.out.println("YES");
+                    String[] directivesArray = messageSpecs.split("\0");
                     ui.appendMessage(directivesArray[0], directivesArray[1], directivesArray[2], "Don't worry bout it");
                 }
             } catch (IOException e) {
@@ -98,7 +103,6 @@ public class Client {
                     messageContent.setBorder(new EmptyBorder(7, 7, 7, 7)); 
                     messageContent.setOpaque(false);
                     messageContent.setEditable(false);
-    
                     StyledDocument messageStyles = messageContent.getStyledDocument();
                     Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
                     Style regular = (messageStyles.addStyle("regular", def));
@@ -154,6 +158,7 @@ public class Client {
             if (messageType.equals("String")) {
                 System.out.println("added to chtbox");
                JPanel row = new JPanel(new BorderLayout(10, 10));
+               
                row.add((new ChatMessage(messageType, message_content, sender)).getMessageComponent(), BorderLayout.EAST);
                chatBox.add(row);
                chatBox.revalidate();
@@ -164,8 +169,8 @@ public class Client {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == sendButton) {
-                System.out.println("This works");
-                ui.appendMessage("String", messageInput.getText().trim(), "@me", "today");
+                textToServer.println("String\0" + messageInput.getText().trim() + "\0" + clientSocket.getInetAddress().toString() +"\0today");
+                
             }
         }
 
@@ -179,12 +184,13 @@ public class Client {
         
         // Connect just like in the past assignments
         clientSocket = new Socket(IP, port);
-        System.out.println("Connected to Server 😎");
 
         fromServer =  new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         textToServer = new PrintWriter(clientSocket.getOutputStream(), true); // Autoflush output Stream please
 
         System.out.println("Successfully allocated Writers and Readers, and Connected to Server");
+
+
     }
     public void startThread(BufferedReader fromServer) {
         receiverThread = new ReceiverThread(fromServer, ui);

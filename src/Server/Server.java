@@ -3,6 +3,7 @@ package Server;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -12,24 +13,63 @@ import javax.imageio.*;
 public class Server {
 
     ServerSocket serverSocket; // Establish the server socket
+    ArrayList<ClientHandler> clientArray = new ArrayList<ClientHandler>();
     Socket clientSocket; // Receiver for the clientSocket that connects to our server
-    BufferedReader fromClient; // Used to read messages sent from the client
-    OutputStream imageToClient; // Used to output the image byteArray as an output stream over to the client
-    PrintWriter textToClient; // Used to output text messages to the client :)
-    ByteArrayOutputStream imageStream;
+    // ClientHandler extends thread for multi-threading, just like ReceiverThread
+    public class ClientHandler extends Thread {
+        Socket socket; // Receiver for the clientSocket that connects to our server
+        BufferedReader fromClient; // Used to read messages sent from the client
+        OutputStream imageToClient; // Used to output the image byteArray as an output stream over to the client
+        PrintWriter textToClient; // Used to output text messages to the client :)
+        ArrayList<ClientHandler> clients; // This is a reference to an array containing all clients connected to the session. Useful for dispersing messages
 
+        public ClientHandler(Socket socket, ArrayList<ClientHandler> clients) {
+            // Save the client socket locally.
+            this.socket = socket;
+            this.clients = clients;
+        }
+
+        public void run() {
+            try {
+                fromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                textToClient = new PrintWriter(socket.getOutputStream());
+
+                String clientMessage;
+                while((clientMessage = fromClient.readLine()) != null) {
+                    System.out.println("Received message: " + clientMessage);
+                    emitToClients(clientMessage);
+                }
+
+            } catch (Exception e) {
+                System.out.println("Exception occured in clientHandler for IP: " + socket.getInetAddress());
+                System.out.println(e.getMessage());
+            }
+        }
+
+        public void emitToClients(String message) throws IOException {
+            for (ClientHandler clientHandler : clients) {
+                System.out.println("Sent Message to client: " + clientHandler.socket.getInetAddress().toString());
+                PrintWriter clientWriter = new PrintWriter(clientHandler.socket.getOutputStream(), true);
+                clientWriter.println(message);
+            }
+        }
+    }
     public Server(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         System.out.println("Server Initialized: Ready for Clients to Connect");
     
-        // Wait for the client to connect
-        clientSocket = serverSocket.accept();
-        System.out.println("Client has successfully connected from IP: " + clientSocket.getRemoteSocketAddress().toString());
-    
-        fromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));;
-        textToClient =  new PrintWriter(clientSocket.getOutputStream(), true);
+        // For this setup, I'll be using a multi-threading approach
+        // that generates an arbitrary amount of client socket "handlers" 
+        // wwhenever a new client connection is attempted
 
-        // Wait for the client to be ready to accept images
+        while (true) {
+            clientSocket = serverSocket.accept();
+            System.out.println("Client has successfully connected from IP: " + clientSocket.getRemoteSocketAddress().toString());
+            ClientHandler newClient = new ClientHandler(clientSocket, clientArray);
+            clientArray.add(newClient);
+            newClient.start();
+
+        }
     }
     
     public static void main(String[] args) {
