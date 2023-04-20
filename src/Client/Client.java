@@ -37,6 +37,7 @@ public class Client {
     BufferedReader fromServer;
     PrintWriter textToServer;
     OutputStream imageToServer;
+    String username;
     ChatUI ui;
     
     boolean sessionEnd;
@@ -169,7 +170,7 @@ public class Client {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == sendButton) {
-                textToServer.println("String\0" + messageInput.getText().trim() + "\0" + clientSocket.getInetAddress().toString() +"\0today");
+                textToServer.println("String\0" + messageInput.getText().trim() + "\0" + username +"\0today");
                 
             }
         }
@@ -180,8 +181,9 @@ public class Client {
         ui = new ChatUI();
     }
 
-    public void connect(String IP, int port) throws IOException {
+    public void connect(String IP, int port, String username) throws IOException {
         
+        this.username =  username;
         // Connect just like in the past assignments
         clientSocket = new Socket(IP, port);
 
@@ -206,9 +208,9 @@ public class Client {
         try {
             Client client = new Client();
             if (args.length > 0)
-                client.connect(args[0], Integer.parseInt(args[1]));
+                client.connect(args[0], Integer.parseInt(args[1]), args[2]);
             else
-                client.connect("localhost", 3000);
+                client.connect("localhost", 3000, "Angel");
             client.startThread(client.fromServer);
             client.instantiateUI();
         } catch (Exception e) {
