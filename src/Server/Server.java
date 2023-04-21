@@ -92,25 +92,7 @@ public class Server {
                     // Client can be in one of 2 states
                     if (this.clientState.equals("LOBBY")) {
                         textToClient.println(
-                                """
-                                        Hello!
-
-                                        Welcome to the Proof of Concept for the WhatsApp Dos Message Transfer Protocol (WADMTPs)
-                                        You can use any of the following commands:
-
-                                        /leave
-                                        Allows you to leave the chatroom you are currently in
-
-                                        /join <roomName>
-                                        Allows you to join the room with name <roomName> if the room is currently available. Otherwise creates a room with that name
-
-                                        /list
-                                        Lists all of the chat rooms currently available on the server by name
-
-                                        /exit
-                                        End the program overall
-
-                                            """);
+                                "\nHello!\n\nWelcome to the Proof of Concept for the WhatsApp Dos Message Transfer Protocol (WADMTPs)\nYou can use any of the following commands:\n\n/leave\nAllows you to leave the chatroom you are currently in\n\n/join <roomName>\nAllows you to join the room with name <roomName> if the room is currently available. Otherwise creates a room with that name\n\n/list\nLists all of the chat rooms currently available on the server by name\n\n/exit\nEnd the program overall");
 
                         // Await for response from client response will most likely be a command if not
                         // a command, handle appropriately
@@ -153,21 +135,7 @@ public class Server {
 
                             } else {
                                 textToClient.println(
-                                        """
-                                                Sorry, it appears that you have typed something that is not a command. Please try again using one of the following commands:
-
-                                                /leave
-                                                Allows you to leave the chatroom you are currently in
-
-                                                /join <roomName>
-                                                Allows you to join the room with name <roomName> if the room is currently available
-
-                                                /list
-                                                Lists all of the chat rooms currently available on the server by name
-
-                                                /exit
-                                                End the program overall
-                                                """);
+                                        "\nSorry, it appears that you have typed something that is not a command. Please try again using one of the following commands:\n\n/leave\nAllows you to leave the chatroom you are currently in\n\n/join <roomName>\nAllows you to join the room with name <roomName> if the room is currently available\n\n/list\nLists all of the chat rooms currently available on the server by name\n\n/exit\nEnd the program overall");
 
                                 // Go back to the loop, weh
                             }
