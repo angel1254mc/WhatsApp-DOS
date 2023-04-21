@@ -3,6 +3,7 @@ package Server;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,9 +23,9 @@ public class Server {
         OutputStream imageToClient; // Used to output the image byteArray as an output stream over to the client
         PrintWriter textToClient; // Used to output text messages to the client :)
         ArrayList<ClientHandler> clients; // This is a reference to an array containing all clients connected to the session. Useful for dispersing messages
-
+        ClientHandler client;
         public ClientHandler(Socket socket, ArrayList<ClientHandler> clients) {
-            // Save the client socket locally.
+
             this.socket = socket;
             this.clients = clients;
         }
@@ -43,6 +44,13 @@ public class Server {
             } catch (Exception e) {
                 System.out.println("Exception occured in clientHandler for IP: " + socket.getInetAddress());
                 System.out.println(e.getMessage());
+                clients.remove(this);
+                // I LOVE NESTED TRY CATCH EXCEPTIONS
+                try {
+                    emitToClients("Server\0Client with IP: " + socket.getInetAddress().toString() + " has disconnected.\0server\0" + LocalDateTime.now().toString());
+                } catch(Exception exception) {
+                    System.out.println("Client Disconnect Message was not able to be sent to clients.");
+                }
             }
         }
 

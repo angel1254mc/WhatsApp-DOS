@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.util.UUID;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -95,12 +95,9 @@ public class Client {
                 this.sender = sender;
     
                 if (messageType.equals("String")) {
-                    if (sender.equals("@me")) {
-                        
-                    } else {
-                    }
     
                     messageContent = new JTextPane();
+
                     messageContent.setBorder(new EmptyBorder(7, 7, 7, 7)); 
                     messageContent.setOpaque(false);
                     messageContent.setEditable(false);
@@ -121,6 +118,27 @@ public class Client {
                     }
     
                     // What is going ONNNNNNN
+                }
+                if (messageType.equals("Server")) {
+                    messageContent = new JTextPane();
+                    messageContent.setBorder(new EmptyBorder(7, 7, 7, 7)); 
+                    messageContent.setOpaque(false);
+                    messageContent.setEditable(false);
+                    StyledDocument messageStyles = messageContent.getStyledDocument();
+                    Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+                    Style regular = (messageStyles.addStyle("regular", def));
+    
+                    Style textBody = (messageStyles.addStyle("body", regular));
+                    StyleConstants.setFontFamily(textBody,"Inter");
+    
+                    Style foot = messageContent.addStyle("sender", textBody);
+                    StyleConstants.setFontSize(foot, 8);
+                    try {
+                        messageStyles.insertString(0, ((String)this.messageContentObj + "\n"), textBody);
+                        messageStyles.insertString(messageStyles.getLength(), this.sender, foot);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
             }
     
@@ -159,19 +177,29 @@ public class Client {
             if (messageType.equals("String")) {
                 System.out.println("added to chtbox");
                JPanel row = new JPanel(new BorderLayout(10, 10));
-               
-               row.add((new ChatMessage(messageType, message_content, sender)).getMessageComponent(), BorderLayout.EAST);
+               if (!sender.equals(username))
+               row.add((new ChatMessage(messageType, message_content, sender)).getMessageComponent(), BorderLayout.WEST);
+               else
+                row.add((new ChatMessage(messageType, message_content, sender)).getMessageComponent(), BorderLayout.EAST);
                chatBox.add(row);
                chatBox.revalidate();
                chatBox.repaint();
+            }
+            if (messageType.equals("Server")) {
+                System.out.println("Message from Server");
+                JPanel row = new JPanel(new BorderLayout(10, 10));
+                row.add((new ChatMessage(messageType, message_content, sender)).getMessageComponent(), BorderLayout.CENTER);
+                chatBox.add(row);
+                chatBox.revalidate();
+                chatBox.repaint();
             }
         }
     
         @Override
         public void actionPerformed(ActionEvent e) {
+
             if (e.getSource() == sendButton) {
                 textToServer.println("String\0" + messageInput.getText().trim() + "\0" + username +"\0today");
-                
             }
         }
 
@@ -184,6 +212,8 @@ public class Client {
     public void connect(String IP, int port, String username) throws IOException {
         
         this.username =  username;
+        UUID unique_user_identifier = UUID.randomUUID();
+        this.username = unique_user_identifier + this.username;
         // Connect just like in the past assignments
         clientSocket = new Socket(IP, port);
 
