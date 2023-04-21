@@ -46,11 +46,8 @@ public class Client {
         this.scanner = new Scanner(System.in);
     }
 
-    public void connect(String IP, int port, String username) throws IOException {
+    public void connect(String IP, int port) throws IOException {
         
-        this.username =  username;
-        UUID unique_user_identifier = UUID.randomUUID();
-        this.username = unique_user_identifier + this.username;
         // Connect just like in the past assignments
         clientSocket = new Socket(IP, port);
 
@@ -83,9 +80,9 @@ public class Client {
         try {
             Client client = new Client();
             if (args.length > 0)
-                client.connect(args[0], Integer.parseInt(args[1]), args[2]);
+                client.connect(args[0], 3000);
             else
-                client.connect("localhost", 3000, "Angel");
+                client.connect("localhost", 3000);
             client.startThread(client.fromServer);
         } catch (Exception e) {
             System.out.println("An Exception Occured! Error description below: ");
