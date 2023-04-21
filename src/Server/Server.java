@@ -95,13 +95,16 @@ public class Server {
                             You can use any of the following commands:
 
                             /leave
-                            Allows you to either leave the program or leave the chatroom you are currently in
+                            Allows you to leave the chatroom you are currently in
 
                             /join <roomName>
                             Allows you to join the room with name <roomName> if the room is currently available. Otherwise creates a room with that name
 
                             /list
                             Lists all of the chat rooms currently available on the server by name
+
+                            /exit
+                            End the program overall
 
                                 """);
 
@@ -150,13 +153,16 @@ public class Server {
                                             Sorry, it appears that you have typed something that is not a command. Please try again using one of the following commands:
 
                                             /leave
-                                            Allows you to either leave the program or leave the chatroom you are currently in
+                                            Allows you to leave the chatroom you are currently in
 
                                             /join <roomName>
                                             Allows you to join the room with name <roomName> if the room is currently available
 
                                             /list
                                             Lists all of the chat rooms currently available on the server by name
+
+                                            /exit
+                                            End the program overall
                                             """);
 
                                     // Go back to the loop, weh
